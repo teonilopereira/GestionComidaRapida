@@ -50,16 +50,9 @@ namespace GestionComidaRapida.form.Helpers
                 case ProductoDtos producto:
                     r.Cells[0].Value = producto.ProductoId;
                     r.Cells[1].Value = producto.Nombre;
-                    r.Cells[2].Value = producto.Precio;
+                        r.Cells[2].Value = producto.Precio;
                     r.Cells[3].Value = producto.Stock;
                     r.Cells[4].Value = producto.Tamaño;
-
-                    break;
-                case Combo combo:
-                    r.Cells[0].Value = combo.ProductoId;
-                    r.Cells[1].Value = combo.Nombre;
-                    r.Cells[2].Value = combo.Precio;
-                    r.Cells[3].Value =  combo.Precio;
                     break;
                 case Categorias c:
                     r.Cells[0].Value = c.CategoriaId;

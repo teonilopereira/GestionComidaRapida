@@ -9,6 +9,7 @@ namespace GestionComidaRapida.Entidades.Entidades
         public int TamañoId { get; set; }
         public string? Descripcion { get; set; }
         public decimal Precio { get; set; }
+        public decimal PrecioVenta { get; set; }
         public int CategoriaId { get; set; }
         public string? Imagen { get; set; }
         public int? TipoProductoId { get; set; }

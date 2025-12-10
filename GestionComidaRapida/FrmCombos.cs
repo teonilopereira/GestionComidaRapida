@@ -196,11 +196,23 @@ namespace GestionComidaRapida.form
             var r = dgvDatos.SelectedRows[0];
             if (r.Tag is null) return;
 
-            CombosDto comboDto = (CombosDto)r.Tag;
-            Producto? comb = _servicio!?.GetProductoPorId(tipoProducto, comboDto.ProductoId);
+            int productoId;
+            if (r.Tag is CombosDto comboDto)
+            {
+                productoId = comboDto.ProductoId;
+            }
+            else if (r.Tag is ProductoDtos productoDtoGen)
+            {
+                productoId = productoDtoGen.ProductoId;
+            }
+            else
+            {
+                MessageBox.Show("Tipo de dato inesperado en la fila seleccionada", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Producto? comb = _servicio!?.GetProductoPorId(tipoProducto, productoId);
             if (comb is null) return;
-
-
 
             FrmCombosAE frm = new FrmCombosAE(_serviceProvider, tipoProducto) { Text = "Editar Combo" };
             frm.SetCombo((Combo)comb!);
@@ -247,36 +259,58 @@ namespace GestionComidaRapida.form
 
             }
 
+
         }
 
         private void BtnBorrar_Click(object sender, EventArgs e)
         {
-
             if (dgvDatos.SelectedRows.Count == 0)
             {
                 return;
             }
-            var r = dgvDatos.SelectedRows[0];
 
+            var r = dgvDatos.SelectedRows[0];
             if (r.Tag is null) { return; }
-            CombosDto productoDto = (CombosDto)r.Tag;
-            Producto? prod = _servicio!?.GetProductoPorId(tipoProducto, productoDto.ProductoId);
+
+            int productoId;
+            string nombreMostrar;
+            if (r.Tag is CombosDto comboDto)
+            {
+                productoId = comboDto.ProductoId;
+                nombreMostrar = comboDto.Nombre;
+            }
+            else if (r.Tag is ProductoDtos productoDtoGen)
+            {
+                productoId = productoDtoGen.ProductoId;
+                nombreMostrar = productoDtoGen.Nombre;
+            }
+            else
+            {
+                MessageBox.Show("Tipo de dato inesperado en la fila seleccionada",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Producto? prod = _servicio!?.GetProductoPorId(tipoProducto, productoId);
+            if (prod is null) return;
+
             try
             {
+                DialogResult dr = MessageBox.Show(
+                    $@"¿Desea dar de baja el {nombreMostrar}?",
+                    "Confirmar Baja",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button2);
 
-                DialogResult dr = MessageBox.Show($@"¿Desea dar de baja el {prod!.Nombre}?",
-                       "Confirmar Baja",
-                       MessageBoxButtons.YesNo,
-                       MessageBoxIcon.Question,
-                       MessageBoxDefaultButton.Button2);
                 if (dr == DialogResult.No)
                 {
                     return;
                 }
 
-                if (!_servicio!.EstaRelacionado(tipoProducto, prod.ProductoId))
+                if (!_servicio!.EstaRelacionado(tipoProducto, productoId))
                 {
-                    _servicio!.Borrar(tipoProducto, prod.ProductoId);
+                    _servicio!.Borrar(tipoProducto, productoId);
                     totalRecords = _servicio!.GetCantidad(tipoProducto);
                     totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
                     if (currentPage > totalPages) currentPage = totalPages;
@@ -286,7 +320,6 @@ namespace GestionComidaRapida.form
                         "Mensaje",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);
-
                 }
                 else
                 {
@@ -294,23 +327,56 @@ namespace GestionComidaRapida.form
                         "Error",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
-
                 }
             }
             catch (Exception ex)
             {
-
-
                 MessageBox.Show(ex.Message,
-                            "Error",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Error);
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
+
 
         private void BtnActualizar_Click(object sender, EventArgs e)
         {
             RecargarGrilla();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            currentPage = 1;
+            LoadData(tipoProducto);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (currentPage > 1)
+            {
+                currentPage--;
+                LoadData(tipoProducto);
+            }
+        }
+
+        private void BtnSiguien_Click(object sender, EventArgs e)
+        {
+            currentPage = totalPages;
+            LoadData(tipoProducto);
+        }
+
+        private void BtnUlti_Click(object sender, EventArgs e)
+        {
+            if (currentPage < totalPages)
+            {
+                currentPage++;
+                LoadData(tipoProducto);
+            }
+        }
+
+        private void BTSalir_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

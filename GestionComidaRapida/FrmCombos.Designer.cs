@@ -31,6 +31,11 @@
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmCombos));
             dgvDatos = new DataGridView();
+            colId = new DataGridViewTextBoxColumn();
+            ColNombre = new DataGridViewTextBoxColumn();
+            ColPrecio = new DataGridViewTextBoxColumn();
+            ColStock = new DataGridViewTextBoxColumn();
+            ColTamaño = new DataGridViewTextBoxColumn();
             panel2 = new Panel();
             BtnActualizar = new Button();
             BtnFiltrar = new Button();
@@ -38,6 +43,10 @@
             BtnBorrar = new Button();
             BtnAgregar = new Button();
             panel1 = new Panel();
+            BtnUlti = new Button();
+            BtnSiguien = new Button();
+            button3 = new Button();
+            button4 = new Button();
             BTSalir = new PictureBox();
             btnUltimo = new Button();
             btnSiguiente = new Button();
@@ -48,11 +57,6 @@
             label2 = new Label();
             label1 = new Label();
             pictureBox2 = new PictureBox();
-            colId = new DataGridViewTextBoxColumn();
-            ColNombre = new DataGridViewTextBoxColumn();
-            ColPrecio = new DataGridViewTextBoxColumn();
-            ColStock = new DataGridViewTextBoxColumn();
-            ColTamaño = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dgvDatos).BeginInit();
             panel2.SuspendLayout();
             panel1.SuspendLayout();
@@ -79,8 +83,49 @@
             dgvDatos.RowHeadersVisible = false;
             dgvDatos.RowHeadersWidth = 62;
             dgvDatos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvDatos.Size = new Size(1136, 594);
+            dgvDatos.Size = new Size(1361, 594);
             dgvDatos.TabIndex = 12;
+            // 
+            // colId
+            // 
+            colId.HeaderText = "Id";
+            colId.MinimumWidth = 8;
+            colId.Name = "colId";
+            colId.ReadOnly = true;
+            colId.Visible = false;
+            colId.Width = 150;
+            // 
+            // ColNombre
+            // 
+            ColNombre.HeaderText = "Nombre";
+            ColNombre.MinimumWidth = 8;
+            ColNombre.Name = "ColNombre";
+            ColNombre.ReadOnly = true;
+            ColNombre.Width = 150;
+            // 
+            // ColPrecio
+            // 
+            ColPrecio.HeaderText = "Precio";
+            ColPrecio.MinimumWidth = 8;
+            ColPrecio.Name = "ColPrecio";
+            ColPrecio.ReadOnly = true;
+            ColPrecio.Width = 150;
+            // 
+            // ColStock
+            // 
+            ColStock.HeaderText = "Stock";
+            ColStock.MinimumWidth = 8;
+            ColStock.Name = "ColStock";
+            ColStock.ReadOnly = true;
+            ColStock.Width = 150;
+            // 
+            // ColTamaño
+            // 
+            ColTamaño.HeaderText = "Tamaño";
+            ColTamaño.MinimumWidth = 8;
+            ColTamaño.Name = "ColTamaño";
+            ColTamaño.ReadOnly = true;
+            ColTamaño.Width = 150;
             // 
             // panel2
             // 
@@ -156,6 +201,10 @@
             // 
             panel1.BackColor = Color.FromArgb(64, 0, 64);
             panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(BtnUlti);
+            panel1.Controls.Add(BtnSiguien);
+            panel1.Controls.Add(button3);
+            panel1.Controls.Add(button4);
             panel1.Controls.Add(BTSalir);
             panel1.Controls.Add(btnUltimo);
             panel1.Controls.Add(btnSiguiente);
@@ -169,9 +218,57 @@
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1322, 90);
+            panel1.Size = new Size(1547, 90);
             panel1.TabIndex = 10;
             panel1.Paint += panel1_Paint;
+            // 
+            // BtnUlti
+            // 
+            BtnUlti.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            BtnUlti.Location = new Point(1159, 3);
+            BtnUlti.Margin = new Padding(4, 5, 4, 5);
+            BtnUlti.Name = "BtnUlti";
+            BtnUlti.Size = new Size(94, 35);
+            BtnUlti.TabIndex = 53;
+            BtnUlti.Text = "Ultimo";
+            BtnUlti.UseVisualStyleBackColor = true;
+            BtnUlti.Click += BtnUlti_Click;
+            // 
+            // BtnSiguien
+            // 
+            BtnSiguien.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            BtnSiguien.Location = new Point(1040, 3);
+            BtnSiguien.Margin = new Padding(4, 5, 4, 5);
+            BtnSiguien.Name = "BtnSiguien";
+            BtnSiguien.Size = new Size(97, 35);
+            BtnSiguien.TabIndex = 54;
+            BtnSiguien.Text = "Siguiente";
+            BtnSiguien.UseVisualStyleBackColor = true;
+            BtnSiguien.Click += BtnSiguien_Click;
+            // 
+            // button3
+            // 
+            button3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button3.Location = new Point(932, 3);
+            button3.Margin = new Padding(4, 5, 4, 5);
+            button3.Name = "button3";
+            button3.Size = new Size(90, 35);
+            button3.TabIndex = 55;
+            button3.Text = "Anterior";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
+            // button4
+            // 
+            button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button4.Location = new Point(820, 3);
+            button4.Margin = new Padding(4, 5, 4, 5);
+            button4.Name = "button4";
+            button4.Size = new Size(86, 35);
+            button4.TabIndex = 56;
+            button4.Text = "Primero";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
             // 
             // BTSalir
             // 
@@ -182,11 +279,12 @@
             BTSalir.SizeMode = PictureBoxSizeMode.Zoom;
             BTSalir.TabIndex = 52;
             BTSalir.TabStop = false;
+            BTSalir.Click += BTSalir_Click;
             // 
             // btnUltimo
             // 
             btnUltimo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnUltimo.Location = new Point(2273, 5);
+            btnUltimo.Location = new Point(2498, 5);
             btnUltimo.Margin = new Padding(4, 5, 4, 5);
             btnUltimo.Name = "btnUltimo";
             btnUltimo.Size = new Size(94, 35);
@@ -197,7 +295,7 @@
             // btnSiguiente
             // 
             btnSiguiente.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnSiguiente.Location = new Point(2154, 5);
+            btnSiguiente.Location = new Point(2379, 5);
             btnSiguiente.Margin = new Padding(4, 5, 4, 5);
             btnSiguiente.Name = "btnSiguiente";
             btnSiguiente.Size = new Size(97, 35);
@@ -208,7 +306,7 @@
             // btnAnterior
             // 
             btnAnterior.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnAnterior.Location = new Point(2046, 5);
+            btnAnterior.Location = new Point(2271, 5);
             btnAnterior.Margin = new Padding(4, 5, 4, 5);
             btnAnterior.Name = "btnAnterior";
             btnAnterior.Size = new Size(90, 35);
@@ -219,7 +317,7 @@
             // btnPrimero
             // 
             btnPrimero.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnPrimero.Location = new Point(1934, 5);
+            btnPrimero.Location = new Point(2159, 5);
             btnPrimero.Margin = new Padding(4, 5, 4, 5);
             btnPrimero.Name = "btnPrimero";
             btnPrimero.Size = new Size(86, 35);
@@ -273,59 +371,18 @@
             // 
             pictureBox2.BackgroundImage = (Image)resources.GetObject("pictureBox2.BackgroundImage");
             pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
-            pictureBox2.Location = new Point(50, -1);
+            pictureBox2.Location = new Point(51, -1);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(90, 90);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox2.TabIndex = 3;
             pictureBox2.TabStop = false;
             // 
-            // colId
-            // 
-            colId.HeaderText = "Id";
-            colId.MinimumWidth = 8;
-            colId.Name = "colId";
-            colId.ReadOnly = true;
-            colId.Visible = false;
-            colId.Width = 150;
-            // 
-            // ColNombre
-            // 
-            ColNombre.HeaderText = "Nombre";
-            ColNombre.MinimumWidth = 8;
-            ColNombre.Name = "ColNombre";
-            ColNombre.ReadOnly = true;
-            ColNombre.Width = 150;
-            // 
-            // ColPrecio
-            // 
-            ColPrecio.HeaderText = "Precio";
-            ColPrecio.MinimumWidth = 8;
-            ColPrecio.Name = "ColPrecio";
-            ColPrecio.ReadOnly = true;
-            ColPrecio.Width = 150;
-            // 
-            // ColStock
-            // 
-            ColStock.HeaderText = "Stock";
-            ColStock.MinimumWidth = 8;
-            ColStock.Name = "ColStock";
-            ColStock.ReadOnly = true;
-            ColStock.Width = 150;
-            // 
-            // ColTamaño
-            // 
-            ColTamaño.HeaderText = "Tamaño";
-            ColTamaño.MinimumWidth = 8;
-            ColTamaño.Name = "ColTamaño";
-            ColTamaño.ReadOnly = true;
-            ColTamaño.Width = 150;
-            // 
             // FrmCombos
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1322, 684);
+            ClientSize = new Size(1547, 684);
             Controls.Add(dgvDatos);
             Controls.Add(panel2);
             Controls.Add(panel1);
@@ -366,5 +423,9 @@
         private DataGridViewTextBoxColumn ColPrecio;
         private DataGridViewTextBoxColumn ColStock;
         private DataGridViewTextBoxColumn ColTamaño;
+        private Button BtnUlti;
+        private Button BtnSiguien;
+        private Button button3;
+        private Button button4;
     }
 }

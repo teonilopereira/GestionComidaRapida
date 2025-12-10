@@ -42,28 +42,31 @@
             // 
             // btnOK
             // 
+            btnOK.BackColor = Color.Purple;
             btnOK.Location = new Point(21, 220);
             btnOK.Name = "btnOK";
             btnOK.Size = new Size(227, 51);
             btnOK.TabIndex = 0;
             btnOK.Text = "OK";
-            btnOK.UseVisualStyleBackColor = true;
+            btnOK.UseVisualStyleBackColor = false;
             btnOK.Click += btnOK_Click;
             // 
             // btnCancel
             // 
+            btnCancel.BackColor = Color.Purple;
             btnCancel.Location = new Point(371, 220);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(227, 51);
             btnCancel.TabIndex = 0;
             btnCancel.Text = "Cancelar";
-            btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.UseVisualStyleBackColor = false;
             btnCancel.Click += btnCancel_Click;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(43, 53);
+            label1.ForeColor = SystemColors.ButtonHighlight;
+            label1.Location = new Point(46, 90);
             label1.Name = "label1";
             label1.Size = new Size(172, 25);
             label1.TabIndex = 1;
@@ -72,7 +75,8 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(142, 128);
+            label2.ForeColor = SystemColors.ButtonHighlight;
+            label2.Location = new Point(145, 165);
             label2.Name = "label2";
             label2.Size = new Size(87, 25);
             label2.TabIndex = 1;
@@ -81,7 +85,7 @@
             // cboProductos
             // 
             cboProductos.FormattingEnabled = true;
-            cboProductos.Location = new Point(221, 53);
+            cboProductos.Location = new Point(224, 90);
             cboProductos.Name = "cboProductos";
             cboProductos.Size = new Size(318, 33);
             cboProductos.TabIndex = 2;
@@ -89,7 +93,7 @@
             // 
             // nudCantidad
             // 
-            nudCantidad.Location = new Point(235, 128);
+            nudCantidad.Location = new Point(238, 165);
             nudCantidad.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             nudCantidad.Name = "nudCantidad";
             nudCantidad.Size = new Size(166, 31);
@@ -104,6 +108,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ActiveCaptionText;
             ClientSize = new Size(637, 308);
             Controls.Add(nudCantidad);
             Controls.Add(cboProductos);

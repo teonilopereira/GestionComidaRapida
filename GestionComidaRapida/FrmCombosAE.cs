@@ -41,8 +41,7 @@ namespace GestionComidaRapida.form
             CombosHelper.CargarComboTamaño(ref cboTamanio, _serviceProvider);
             txtProducto.Text = combo.Nombre;
             txtDescripcion.Text = combo.Descripcion;
-            txtTipoProductos.Text = tipoProd.ToString();
-            txtPrecioCosto.Text = combo.Precio.ToString();
+            txtPrecioVta.Text = combo.Detalles.Sum(d => d.sumatoriaPrecioventa).ToString("0.00");
             nudStock.Value = combo.Stock;
             cboTamanio.SelectedValue = combo.TamañoId;
         }
@@ -94,17 +93,17 @@ namespace GestionComidaRapida.form
             }
 
             string patron = @"^\d+(\.\d+)?$";
-            if (!Regex.IsMatch(txtPrecioCosto.Text, patron))
+            if (!Regex.IsMatch(txtPrecioVta.Text, patron))
             {
-                errorProvider1.SetError(txtPrecioCosto, "Precio de costo no es válido");
+                errorProvider1.SetError(txtPrecioVta, "Precio de costo no es válido");
             }
             else
             {
-                if (!decimal.TryParse(txtPrecioCosto.Text, out decimal pCosto)
+                if (!decimal.TryParse(txtPrecioVta.Text, out decimal pCosto)
                 || pCosto <= 0)
                 {
                     valido = false;
-                    errorProvider1.SetError(txtPrecioCosto, "Precio de costo igual a cero");
+                    errorProvider1.SetError(txtPrecioVta, "Precio de costo igual a cero");
                 }
             }
             if (cboTamanio.SelectedIndex == 0)
@@ -130,8 +129,7 @@ namespace GestionComidaRapida.form
             base.OnLoad(e);
             if (combo is null)
             {
-                txtTipoProductos.Text = tipoProd.ToString();
-                txtPrecioCosto.Text = "0";
+                txtPrecioVta.Text = "0";
 
 
 
@@ -152,7 +150,8 @@ namespace GestionComidaRapida.form
             {
                 combo!.Nombre = txtProducto.Text;
                 combo.Descripcion = txtDescripcion.Text;
-                combo.Precio = decimal.Parse(txtPrecioCosto.Text);
+                txtPrecioVta.Text = combo.Precio.ToString("0.00");
+                combo.Precio = combo.Detalles.Sum(d => d.sumatoriaPrecioventa);
                 combo.Stock = (int)nudStock.Value;
 
 
@@ -205,7 +204,6 @@ namespace GestionComidaRapida.form
         }
         private void FrmCombosAE_Load(object sender, EventArgs e)
         {
-            txtTipoProductos.Text = tipoProd.ToString();
         }
 
         private void btnCancelar_Click_1(object sender, EventArgs e)

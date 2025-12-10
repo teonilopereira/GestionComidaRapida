@@ -3,13 +3,7 @@ using GestionComidaRapida.Datos.Interfaces;
 using GestionComidaRapida.Entidades.Dtos;
 using GestionComidaRapida.Entidades.Entidades;
 using GestionComidaRapida.Entidades.Enum;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GestionComidaRapida.Datos.Repositorios
 {
@@ -29,12 +23,12 @@ namespace GestionComidaRapida.Datos.Repositorios
                 int pk = conn.QuerySingle<int>(query, new
                 {
                     Producto = producto.Nombre,
-                    producto.Descripcion,
-                    producto.Stock,
-                    producto.TamañoId,
-                    producto.Precio,
-                    producto.CategoriaId,
-                    producto.Imagen,
+                    Descripcion = producto.Descripcion,
+                    Stock = producto.Stock,
+                    TamañoId = producto.TamañoId,
+                    Precio = producto.Precio,
+                    CategoriaId = producto.CategoriaId,
+                    Imagen = producto.Imagen,
                 }, tran);
 
                 if (pk == 0) throw new Exception("No se pudo insertar el producto");
@@ -52,8 +46,8 @@ namespace GestionComidaRapida.Datos.Repositorios
             int comboPk = conn.QuerySingle<int>(queryCombo, new
             {
                 Nombre = producto.Nombre,
-                producto.Precio,
-                producto.Stock,
+                Precio = producto.Precio,
+                Stock = producto.Stock,
                 Tamaño = producto.TamañoId
             }, tran);
 
@@ -65,13 +59,12 @@ namespace GestionComidaRapida.Datos.Repositorios
         {
             if (tipoProducto != TipoProducto.Combo)
             {
-                if (EstaRelacionado(tipoProducto, productoId, conn, tran))
-                    throw new InvalidOperationException("No se puede eliminar el registro porque existe en un combo o en una venta");
+                var deleteQuery = @"DELETE FROM Productos WHERE ProductoId=@ProductoId";
+                int registrosAfectados = conn.Execute(deleteQuery, new { ProductoId = productoId }, tran);
+                if (registrosAfectados == 0)
+                    throw new Exception("No se pudo borrar el producto");
 
-                var deleteQuery = "DELETE FROM Productos WHERE ProductoId=@ProductoId";
-                int rows = conn.Execute(deleteQuery, new { ProductoId = productoId }, tran);
-                if (rows == 0) throw new Exception("No se pudo borrar el producto");
-                return; 
+                return;
             }
             try
             {
@@ -105,14 +98,14 @@ namespace GestionComidaRapida.Datos.Repositorios
 
                 int rows = conn.Execute(query, new
                 {
-                    Nombre = producto.Nombre,
-                    Descripcion = producto.Descripcion,
-                    Stock=producto.Stock,
-                    TamañoId = producto.TamañoId,
-                    Precio = producto.Precio,
-                    CategoriaId = producto.CategoriaId,
-                    Imagen = producto.Imagen,
-                    ProductoId = producto.ProductoId
+                    producto.Nombre,
+                    producto.Descripcion,
+                    producto.Stock,
+                    producto.TamañoId,
+                    producto.Precio,
+                    producto.CategoriaId,
+                    producto.Imagen,
+                    producto.ProductoId
                 }, tran);
 
                 if (rows == 0)
@@ -152,31 +145,26 @@ namespace GestionComidaRapida.Datos.Repositorios
             if (tipoProducto is not TipoProducto.Combo)
             {
                 var selectQuery = @"
-                            SELECT COUNT(*) 
-                            FROM DetallesCombos
-                            WHERE ProductoId = @ProductoId AND 
-                      (SELECT COUNT(*) FROM DetallesCombos WHERE ProductoId = @ProductoId) = 0";
+            SELECT COUNT(*) 
+            FROM DetallesCombos
+            WHERE ProductoId = @ProductoId
+        ";
 
-                return conn.QuerySingle<int>(selectQuery, new { ProductoId = productoId }) > 0;
-
+                return conn.QuerySingle<int>(selectQuery, new { ProductoId = productoId }, tran) > 0;
             }
             else
             {
-                if (tipoProducto is TipoProducto.Combo)
-                {
-                    var selectQuery = @" 
-                        SELECT COUNT(*) 
-                        FROM DetalleOrden
-                        WHERE ComboId = @ProductoId";
+                var selectQuery = @" 
+            SELECT COUNT(*) 
+            FROM DetalleOrden
+            WHERE ComboId = @ProductoId
+        ";
 
-                    return conn.QuerySingle<int>(selectQuery, new { ProductoId = productoId }) > 0;
-
-                }
+                return conn.QuerySingle<int>(selectQuery, new { ProductoId = productoId }, tran) > 0;
             }
-            return false;
         }
 
-      public bool Existe(Producto producto, SqlConnection conn, SqlTransaction? tran = null)
+        public bool Existe(Producto producto, SqlConnection conn, SqlTransaction? tran = null)
         {
             if (producto is Combo combo)
             {
@@ -207,18 +195,17 @@ namespace GestionComidaRapida.Datos.Repositorios
                 producto.ProductoId
             }, tran) > 0;
         }
-
         public int GetCantidad(SqlConnection conn, TipoProducto tipo, Categorias? categorias = null, SqlTransaction? tran = null)
         {
             if (tipo == TipoProducto.Combo)
-                return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM Combos");
+                return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM Combos", null, tran);
 
             string query = "SELECT COUNT(*) FROM Productos";
 
             if (categorias is not null)
                 query += " WHERE CategoriaId=@CategoriaId";
 
-            return conn.ExecuteScalar<int>(query, new { CategoriaId = categorias?.CategoriaId });
+            return conn.ExecuteScalar<int>(query, new { CategoriaId = categorias?.CategoriaId }, tran);
         }
 
 
@@ -232,93 +219,75 @@ namespace GestionComidaRapida.Datos.Repositorios
             SqlTransaction? tran = null)
         {
             var listaProductos = new List<ProductoDtos>();
+            int offset = (currentPage - 1) * pageSize;
 
             if (tipo == TipoProducto.Combo)
             {
                 var selectQueryCombos = $@"
-    SELECT 
-        c.ComboId AS ProductoId,
-        c.NombreCombo AS Nombre,
-        t.Tamaño AS Tamaño,
-        c.Precio AS Precio,
-        c.Stock,
-        'Combo' AS Categoria
-    FROM Combos c
-    INNER JOIN Tamaños t ON t.TamañoId = c.Tamaño
-        ";
-
-                string orderBy = string.Empty;
-                switch (orden)
-                {
-                    case Orden.NombreAZ:
-                        orderBy = " ORDER BY c.NombreCombo";
-                        break;
-                    case Orden.NombreZA:
-                        orderBy = " ORDER BY c.NombreCombo DESC";
-                        break;
-                    case Orden.PrecioAZ:
-                        orderBy = " ORDER BY c.Precio";
-                        break;
-                    case Orden.PrecioZA:
-                        orderBy = " ORDER BY c.Precio DESC";
-                        break;
-                    default:
-                        orderBy = " ORDER BY c.ComboId";
-                        break;
-                }
-
-                selectQueryCombos += orderBy;
-                var listCombo = conn.Query<CombosDto>(selectQueryCombos).ToList();
-                listaProductos.AddRange(listCombo);
-
-            }
-
-            if (tipo != TipoProducto.Combo)
-            {
-                var selectQuery = $@"
-            SELECT 
-                p.ProductoId,
-                p.Producto AS Nombre,
-                t.Tamaño,
-                p.Precio,
-                c.Categoria,
-                p.Stock
-            FROM Productos p
-            INNER JOIN Tamaños t ON t.TamañoId = p.TamañoId
-            INNER JOIN Categorias c ON c.CategoriaId = p.CategoriaId
-
+SELECT 
+    c.ComboId AS ProductoId,
+    c.NombreCombo AS Nombre,
+    t.Tamaño AS Tamaño,
+    c.Precio AS Precio,
+    c.Stock AS Stock,
+    'Combo' AS Categoria
+FROM Combos c
+INNER JOIN Tamaños t ON t.TamañoId = c.Tamaño
 ";
 
-                if (categorias != null)
+                string orderBy = orden switch
                 {
-                    selectQuery += " AND p.CategoriaId = @CategoriaId";
-                }
+                    Orden.NombreAZ => " ORDER BY c.NombreCombo",
+                    Orden.NombreZA => " ORDER BY c.NombreCombo DESC",
+                    Orden.PrecioAZ => " ORDER BY c.Precio",
+                    Orden.PrecioZA => " ORDER BY c.Precio DESC",
+                    _ => " ORDER BY c.ComboId",
+                };
 
-                string orderBy = string.Empty;
-                switch (orden)
-                {
-                    case Orden.NombreAZ:
-                        orderBy = " ORDER BY p.Producto";
-                        break;
-                    case Orden.NombreZA:
-                        orderBy = " ORDER BY p.Producto DESC";
-                        break;
-                    case Orden.PrecioAZ:
-                        orderBy = " ORDER BY p.Precio";
-                        break;
-                    case Orden.PrecioZA:
-                        orderBy = " ORDER BY p.Precio DESC";
-                        break;
-                    default:
-                        orderBy = " ORDER BY p.ProductoId";
-                        break;
-                }
+                selectQueryCombos += orderBy + " OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
-                selectQuery += orderBy;
-                var listaProd = conn.Query<ProductoDtos>(selectQuery).ToList();
-                listaProductos.AddRange(listaProd);
+                var listCombo = conn.Query<ProductoDtos>(selectQueryCombos, new { Offset = offset, PageSize = pageSize }, tran).ToList();
+                listaProductos.AddRange(listCombo);
+                return listaProductos;
             }
-            listaProductos.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            // Productos
+            var selectQuery = $@"
+SELECT 
+    p.ProductoId,
+    p.Producto AS Nombre,
+    t.Tamaño,
+    p.Precio,
+    c.Categoria,
+    p.Stock
+FROM Productos p
+INNER JOIN Tamaños t ON t.TamañoId = p.TamañoId
+INNER JOIN Categorias c ON c.CategoriaId = p.CategoriaId
+WHERE 1=1
+";
+
+            if (categorias != null)
+            {
+                selectQuery += " AND p.CategoriaId = @CategoriaId";
+            }
+
+            string orderByProd = orden switch
+            {
+                Orden.NombreAZ => " ORDER BY p.Producto",
+                Orden.NombreZA => " ORDER BY p.Producto DESC",
+                Orden.PrecioAZ => " ORDER BY p.Precio",
+                Orden.PrecioZA => " ORDER BY p.Precio DESC",
+                _ => " ORDER BY p.ProductoId",
+            };
+
+            selectQuery += orderByProd + " OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+
+            var listaProd = conn.Query<ProductoDtos>(
+                selectQuery,
+                new { CategoriaId = categorias?.CategoriaId, Offset = offset, PageSize = pageSize },
+                tran).ToList();
+
+            listaProductos.AddRange(listaProd);
             return listaProductos;
         }
         public List<Producto> GetListaProductoCombo(SqlConnection conn)
@@ -361,7 +330,7 @@ namespace GestionComidaRapida.Datos.Repositorios
         {
             string query = (tipo == TipoProducto.Producto)
                 ? @"
-                    WITH ProductoOrdenada AS (
+                    WITH X AS (
                         SELECT ROW_NUMBER() OVER (ORDER BY Producto) AS RowNum, Producto
                         FROM Productos
                     )
@@ -397,18 +366,22 @@ namespace GestionComidaRapida.Datos.Repositorios
                 return conn.QuerySingleOrDefault<Producto>(query, new { Id = productoId });
             }
 
-            string comboQuery = @"
+                string comboQuery = @"
                 SELECT 
                     ComboId AS ProductoId,
                     NombreCombo AS Nombre,
                     Precio,
+                    Descripcion,
                    Stock,
                     Tamaño
                 FROM Combos
                 WHERE ComboId=@Id
             ";
+                return conn.QuerySingleOrDefault<Combo>(comboQuery, new { Id = productoId });
+            
 
-            return conn.QuerySingleOrDefault<Combo>(comboQuery, new { Id = productoId });
         }
     }
 }
+        
+    
